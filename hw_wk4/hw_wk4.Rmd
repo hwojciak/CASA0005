@@ -1,7 +1,6 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
+title: "HW4"
+output: html_document
 ---
 ##Corrected version of hw4 in R markdown format: 
 
