@@ -1,0 +1,55 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+##Corrected version of hw4 in R markdown format: 
+
+
+```{r}
+library(tidyverse)
+library(sf)
+library(here)
+library(janitor)
+install.packages('countrycode')
+library(countrycode)
+```
+
+### Reading in Data 
+
+```{r}
+here::here()
+
+WorldRaw <- st_read(here::here("hw_wk4_data",
+                                   "World_Countries_(Generalized).geojson"))
+
+UNDPRaw <- read_csv(here::here("hw_wk4_data",
+                               "HDR23-24_Composite_indices_complete_time_series.csv"),
+                    locale = locale(encoding = "latin1"),
+                       na = " ", skip=0)
+```
+
+### Cleaning Data 
+
+  #### I'm choosing to join the data using country names (rather than country codes)
+  
+```{r}
+UNDPcols<- UNDPRaw %>%
+  clean_names()%>%
+  select(country, gii_2019, gii_2010)%>%
+  mutate(difference=gii_2019-gii_2010)
+
+WorldClean <- WorldRaw %>% 
+  clean_names()
+```
+
+### Join 
+
+```{r}
+Join_UNDP_World <- WorldClean %>% 
+  left_join(., 
+            UNDPcols,
+            by = "country")
+```
+
+
