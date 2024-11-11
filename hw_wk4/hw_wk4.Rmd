@@ -47,7 +47,7 @@ WorldClean <- WorldRaw %>%
   clean_names()
 ```
 
-### Join 
+### Joining Data  
 
 ```{r}
 Join_UNDP_World <- WorldClean %>% 
@@ -56,17 +56,17 @@ Join_UNDP_World <- WorldClean %>%
             by = "country")
 ```
 
-###Creating an Interactive Map 
+### Creating an Interactive Map 
 
 ```{r}
-install.packages("leafpop")
 library(leafpop)
-install.packages("leaflet")
 library(leaflet)
 library(tmap)
 library(tmaptools)
+library(RColorBrewer)
 ```
-#Removing the geometry for our pop up boxes:
+
+Removing the geometry for the pop up boxes:
 
 ```{r}
 
@@ -78,33 +78,31 @@ popupUNDP <-Join_UNDP_World %>%
 tmap_mode("view")
 
 ```
-setting the color for breaks: 
+Setting breaks and colors: 
 
 ```{r}
-breaks=c(-0.009,-0.007, -0.005,-0.002,-0.015, -0.1)
+breaks <- pretty(Join_UNDP_World$`difference`, n = 6)
+
 pal1 <- Join_UNDP_World %>%
-  colorBin(palette = "YlOrRd", domain=.$`difference`, bins=breaks)
+  colorBin(palette = "RdBu",domain=.$`difference`, bins=breaks)
 
 map<- leaflet(Join_UNDP_World) %>%
   addPolygons(color="white", 
-              weight = 2,
+              weight = 1,
               opacity = 1,
-              dashArray = "3",
+              dashArray = "",
               popup = popupUNDP,
               fillOpacity = 0.7,
               fillColor = ~pal1(`difference`),
               group = "difference")%>%
-  
-  #add basemaps
+
   addTiles(group = "UNDP (default)") %>%
   addProviderTiles(providers$Stadia.StamenToner, group = "Toner") %>%
   addProviderTiles(providers$Stadia.StamenTonerLite, group = "Toner Lite") %>%
   addProviderTiles(providers$CartoDB.Positron, group = "CartoDB")%>%
   
-  # add a legend
   addLegend(pal = pal1, values = ~`difference`, group = c("difference"), 
             position ="bottomleft", title = "UNDP gii Differnce") %>%
-  # specify layers control
   addLayersControl(
     baseGroups = c("UNDP (default)", "Toner", "Toner Lite", "CartoDB"),
     options = layersControlOptions(collapsed = FALSE)
